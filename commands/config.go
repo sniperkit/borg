@@ -3,7 +3,7 @@ package commands
 import (
 	"errors"
 
-	"github.com/ok-borg/borg/conf"
+	"github.com/sniperkit/borg/conf"
 )
 
 func init() {

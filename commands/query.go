@@ -13,8 +13,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ok-borg/borg/conf"
-	"github.com/ok-borg/borg/types"
+	"github.com/sniperkit/borg/conf"
+	"github.com/sniperkit/borg/types"
 )
 
 // Query the borg server

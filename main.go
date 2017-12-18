@@ -8,8 +8,8 @@ import (
 
 	"github.com/fatih/color"
 	flag "github.com/juju/gnuflag"
-	"github.com/ok-borg/borg/commands"
-	"github.com/ok-borg/borg/conf"
+	"github.com/sniperkit/borg/commands"
+	"github.com/sniperkit/borg/conf"
 )
 
 var versionNumber, operatingSystem, architecture string

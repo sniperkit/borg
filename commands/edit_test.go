@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/ok-borg/borg/types"
+	"github.com/sniperkit/borg/types"
 	"reflect"
 	"testing"
 )

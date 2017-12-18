@@ -18,4 +18,4 @@ parts:
   borg:
     source: .
     plugin: go
-    go-importpath: github.com/ok-borg/borg
+    go-importpath: github.com/sniperkit/borg

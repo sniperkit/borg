@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ok-borg/borg/conf"
-	"github.com/ok-borg/borg/types"
+	"github.com/sniperkit/borg/conf"
+	"github.com/sniperkit/borg/types"
 )
 
 func init() {
