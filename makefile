@@ -17,8 +17,8 @@ RUNTIME_OS_NAME 			?= $(shell uname -s)
 ## local - build
 
 ## program
-PROG_NAME 					:= request
-PROG_NAME_SUFFIX 			:= colly-
+PROG_NAME 					:= borg
+PROG_NAME_SUFFIX 			:= 
 PROG_SRCS 					:= $(shell git ls-files '*.go' | grep -v '^vendor/')
 
 ## local build
@@ -42,7 +42,7 @@ DOCKER_BIN_FILE_PATH 		:= $(DOCKER_PREFIX_DIR)/$(BIN_BASE_NAME)
 
 #### image
 DOCKER_IMAGE_OWNER 			:= sniperkit
-DOCKER_IMAGE_BASENAME 		:= colly-request
+DOCKER_IMAGE_BASENAME 		:= borg
 DOCKER_IMAGE_TAG 			:= 3.7-alpine
 DOCKER_IMAGE 				:= $(DOCKER_IMAGE_OWNER)/$(DOCKER_IMAGE_BASENAME):$(DOCKER_IMAGE_TAG)
 DOCKER_MULTI_STAGE_IMAGE 	:= $(DOCKER_IMAGE_OWNER)/$(DOCKER_IMAGE_BASENAME)-multi:$(DOCKER_IMAGE_TAG)
@@ -53,7 +53,7 @@ DOCKER_MULTI_STAGE_IMAGE 	:= $(DOCKER_IMAGE_OWNER)/$(DOCKER_IMAGE_BASENAME)-mult
 # vcs
 REPO_VCS 		:= github.com
 REPO_OWNER 		:= sniperkit
-REPO_NAME 		:= colly-request
+REPO_NAME 		:= borg
 REPO_URI 		:= $(REPO_VCS)/$(REPO_OWNER)/$(REPO_NAME)
 REPO_BRANCH 	:= $(subst heads/,,$(shell git rev-parse --abbrev-ref HEAD 2>/dev/null))
 
@@ -193,14 +193,15 @@ docker-push: ## Push docker image to image registry
 	@echo "'docker-push' is not implemented yet..."
 
 build: ## Build binary for local operating system 
-	@go build -ldflags "$(BUILD_LDFLAGS)" -o ./bin/$(BIN_FILE_PATH) *.go
+	# @go build -ldflags "$(BUILD_LDFLAGS)" -o ./bin/$(BIN_FILE_PATH) *.go
+	@go build -v  -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" -o $(BIN_PREFIX_DIR)/$(PROG_NAME) ./cmd/$(PROG_NAME)/*.go
 
-install: deps ## Install binary in your GOBIN path
-	@go install -ldflags "$(BUILD_LDFLAGS)" *.go
+install: ## Install binary in your GOBIN path
+	go install -v -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" ./cmd/$(PROG_NAME)/*.go
 	@$(BIN_BASE_NAME) --version
 
-xbuild: ## Build binaries for linux, darwin in amd64 arch.
-	@gox build -ldflags "$(BUILD_LDFLAGS)" -os="darwin linux" -arch="amd64" -output="$(DIST_DIR)/{{.Dir}}_{{.OS}}_{{.Arch}}" *.go
+dist: ## Build all dist binaries for linux, darwin in amd64 arch.
+	@gox -ldflags="$(BUILD_LDFLAGS)" -os="darwin linux" -arch="amd64" -output="$(DIST_PREFIX_DIR)/{{.Dir}}_{{.OS}}_{{.Arch}}" $(REPO_URI)/cmd/$(PROG_NAME)
 
 version-current: ## Check current version of command build
 	@which $(BIN_BASE_NAME)
@@ -223,9 +224,9 @@ cover: ## Execute coverage tests
 	@gover
 	@go tool cover -html=$(PROG_NAME).coverprofile ./pkg/...
 
-all: clear ## Build for all supported operating systems and architecture
-	go build -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" -o $(BIN_DIR)/$(PROG_NAME) ./cmd/$(PROG_NAME)/*.go
-	go install -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" ./cmd/$(PROG_NAME)/*.go
+all: clear build install ## Build for all supported operating systems and architecture
+#	go build -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" -o $(BIN_DIR)/$(PROG_NAME) ./cmd/$(PROG_NAME)/*.go
+#	go install -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" ./cmd/$(PROG_NAME)/*.go
 
 #deps: clear deps-ci deps-gen ## ensure dependencies for build, ci and code generator(s)
 #	@glide install --strip-vendor
