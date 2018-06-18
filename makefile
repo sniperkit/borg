@@ -1,4 +1,4 @@
-.PHONY: all test clean man glide fast release install help 
+.PHONY: all info clear info-runtime info-vcs docker docker-quick docker-build docker-run docker-info docker-summary docker-commit docker-tag docker-push build install dist version-current clean release cover all deps-gen deps deps-all-glide deps-all-gopkg deps-ensure-glide deps-ensure-gopkg deps-create-glide deps-dev deps-ci deps-test lint vet errcheck interfacer aligncheck structcheck varcheck unconvert gosimple staticcheck unused vendorcheck prealloc test coverage fix-phony help build-freebsd-arm build-linux-arm build-netbsd-arm build-windows
 
 ################################################################################################
 ## local - runtime
@@ -46,6 +46,12 @@ DOCKER_IMAGE_BASENAME 		:= borg
 DOCKER_IMAGE_TAG 			:= 3.7-alpine
 DOCKER_IMAGE 				:= $(DOCKER_IMAGE_OWNER)/$(DOCKER_IMAGE_BASENAME):$(DOCKER_IMAGE_TAG)
 DOCKER_MULTI_STAGE_IMAGE 	:= $(DOCKER_IMAGE_OWNER)/$(DOCKER_IMAGE_BASENAME)-multi:$(DOCKER_IMAGE_TAG)
+
+################################################################################################
+## make
+
+#### vars 
+# TARGETS ?= $(shell awk 'BEGIN {FS = \":.*?## \"} \/^[a-zA-Z_-]+:.*?\#\# / {sub\(\"\\\\n\",sprintf\(\"\n%22c\",\" \"\), $$2\);printf \"%-20s \", $$1}' $(MAKEFILE_LIST))
 
 ################################################################################################
 ## version
@@ -200,8 +206,9 @@ install: ## Install binary in your GOBIN path
 	go install -v -ldflags "-X main.versionNumber=${VERSION} -X main.operatingSystem=${OS} -X main.architecture=${ARCH}" ./cmd/$(PROG_NAME)/*.go
 	@$(BIN_BASE_NAME) --version
 
-dist: ## Build all dist binaries for linux, darwin in amd64 arch.
-	@gox -ldflags="$(BUILD_LDFLAGS)" -os="darwin linux" -arch="amd64" -output="$(DIST_PREFIX_DIR)/{{.Dir}}_{{.OS}}_{{.Arch}}" $(REPO_URI)/cmd/$(PROG_NAME)
+dist-gox: ## Build all dist binaries for linux, darwin in amd64 arch.
+	@gox -ldflags="$(BUILD_LDFLAGS)" -os="darwin linux freebsd netbsd/ openbsd windows" -output="$(DIST_PREFIX_DIR)/{{.Dir}}_{{.OS}}_{{.Arch}}" $(REPO_URI)/cmd/$(PROG_NAME)
+	# -arch="386 amd64 arm" 
 
 version-current: ## Check current version of command build
 	@which $(BIN_BASE_NAME)
@@ -332,6 +339,9 @@ coverage: ## Execute all coverage tests
 		tail -n +2 coverage.out >> coverage-all.out;)
 	@go tool cover -html=coverage-all.out
 
+fix-phony: clear ## Display the list of available targets.
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "%-20s", $$1}' $(MAKEFILE_LIST) | tr -s " "
+
 help: ## Display the list of available targets.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
@@ -342,77 +352,96 @@ help: ## Display the list of available targets.
 #		echo 'For more informations show `webui/readme.md`' > $$PWD/static/DONT-EDIT-FILES-IN-THIS-DIRECTORY.md; \
 #	fi
 
+dist: build-darwin build-linux build-netbsd build-freebsd build-openbsd build-windows
+
 build-%: build-$* ## build a project for this os platform.
 
 # Darwin
 # ==========================
 build-darwin: clear build-darwin-amd64 build-darwin-386
 
+# 	@echo "$(MAKECMDGOALS)"
 build-darwin-amd64: ## Build for Windows x86 only
-	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=darwin -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_darwin_amd64 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=darwin -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_darwin_amd64 ./cmd/$(PROG_NAME)/*.go
 
 build-darwin-386: ## Build for Windows x86 only
-	GOOS=darwin GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=darwin -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_darwin_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=darwin GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=darwin -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_darwin_386 ./cmd/$(PROG_NAME)/*.go
 
 # FreeBSD
 # ==========================
 build-freebsd: clear build-freebsd-386 build-freebsd-amd64 build-freebsd-arm
 
 build-freebsd-386: ## Build for Windows x86 only
-	GOOS=freebsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_freebsd_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=freebsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_freebsd_386 ./cmd/$(PROG_NAME)/*.go
 
 build-freebsd-amd64: ## Build for Windows x86 only
-	GOOS=freebsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_freebsd_amd64 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=freebsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_freebsd_amd64 ./cmd/$(PROG_NAME)/*.go
 
 build-freebsd-arm: ## Build for Windows x86 only
-	GOOS=freebsd GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=arm" -o $(DIST_DIR)/$(PROG_NAME)_freebsd_arm ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=freebsd GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=freebsd -X main.architecture=arm" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_freebsd_arm ./cmd/$(PROG_NAME)/*.go
 
 # Linux
 # ==========================
 build-linux: clear build-linux-386 build-linux-amd64 build-linux-arm
 
 build-linux-386: ## Build for Windows x86 only
-	GOOS=linux GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_linux_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=linux GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_linux_386 ./cmd/$(PROG_NAME)/*.go
 
 build-linux-amd64: ## Build for Windows x86 only
-	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_linux_amd64 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_linux_amd64 ./cmd/$(PROG_NAME)/*.go
 
 build-linux-arm: ## Build for Windows x86 only
-	GOOS=linux GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=arm" -o $(DIST_DIR)/$(PROG_NAME)_linux_arm ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=linux GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=linux -X main.architecture=arm" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_linux_arm ./cmd/$(PROG_NAME)/*.go
 
 # NetBSD
 # ==========================
 build-netbsd: clear build-netbsd-386 build-netbsd-amd64 build-netbsd-arm
 
 build-netbsd-386: ## Build for Windows x86 only
-	GOOS=netbsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_netbsd_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=netbsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_netbsd_386 ./cmd/$(PROG_NAME)/*.go
 
 build-netbsd-amd64: ## Build for Windows x86 only
-	GOOS=netbsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_netbsd_amd64 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=netbsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_netbsd_amd64 ./cmd/$(PROG_NAME)/*.go
 
 build-netbsd-arm: ## Build for Windows x86 only
-	GOOS=netbsd GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=arm" -o $(DIST_DIR)/$(PROG_NAME)_netbsd_arm ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=netbsd GOARCH=arm go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=netbsd -X main.architecture=arm" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_netbsd_arm ./cmd/$(PROG_NAME)/*.go
 
 # OpenBSD
 # ==========================
 build-openbsd: clear build-openbsd-386 build-openbsd-amd64
 
 build-openbsd-386: ## Build for Windows x86 only
-	GOOS=openbsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=openbsd -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_openbsd_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=openbsd GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=openbsd -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_openbsd_386 ./cmd/$(PROG_NAME)/*.go
 
 build-openbsd-amd64: ## Build for Windows x86 only
-	GOOS=openbsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=openbsd -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_openbsd_amd64 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=openbsd GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=openbsd -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_openbsd_amd64 ./cmd/$(PROG_NAME)/*.go
 
 # Windows
 # ==========================
 build-windows: clear build-windows-386 build-windows-amd64 ## Build for Windows x86 and x86_64
 
 build-windows-386: ## Build for Windows x86 only
-	GOOS=windows GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=windows -X main.architecture=386" -o $(DIST_DIR)/$(PROG_NAME)_windows_386 ./cmd/$(PROG_NAME)/*.go
+	@echo "building: $@"
+	@GOOS=windows GOARCH=386 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=windows -X main.architecture=386" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_windows_386 ./cmd/$(PROG_NAME)/*.go
 
+# upx does not work on some arch/OS combos
+# upx $(PROG_NAME)_*
 build-windows-amd64: ## Build for Windows x86_64 only
-	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=windows -X main.architecture=amd64" -o $(DIST_DIR)/$(PROG_NAME)_windows_amd64 ./cmd/$(PROG_NAME)/*.go
-	# upx does not work on some arch/OS combos
-	upx $(PROG_NAME)_*
+	@echo "building: $@"
+	@GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.versionNumber=${VERSION} -X main.operatingSystem=windows -X main.architecture=amd64" -o $(BIN_PREFIX_DIR)/$(PROG_NAME)_windows_amd64 ./cmd/$(PROG_NAME)/*.go
+
 
 	
