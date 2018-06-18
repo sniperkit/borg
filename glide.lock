@@ -1,0 +1,18 @@
+hash: 4aa7307649d2d5ed112c2c5151a9c8fca84c17d4e479c6131e4f4e8621b23da5
+updated: 2018-06-18T10:12:40.028256007+02:00
+imports:
+- name: github.com/fatih/color
+  version: 2d684516a8861da43017284349b7e303e809ac21
+- name: github.com/juju/gnuflag
+  version: 2ce1bb71843d6d179b3f1c1c9cb4a72cd067fc65
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: golang.org/x/sys
+  version: d8e400bc7db4870d786864138af681469693d18c
+  subpackages:
+  - unix
+- name: gopkg.in/yaml.v2
+  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
+testImports: []

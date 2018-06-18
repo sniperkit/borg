@@ -2,7 +2,7 @@
 
 BORG – Search and save shell snippets without leaving your terminal 
 ===
-![cruft guaranteed](https://img.shields.io/badge/cruft-guaranteed-green.svg) [![Travis CI](https://api.travis-ci.org/ok-borg/borg.svg?branch=master)](https://travis-ci.org/ok-borg/borg) [![Go Report Card](https://goreportcard.com/badge/github.com/sniperkit/borg)](https://goreportcard.com/report/github.com/sniperkit/borg) [![Slack Status](http://ok-b.org:1492/badge.svg)](http://ok-b.org:1492)
+![cruft guaranteed](https://img.shields.io/badge/cruft-guaranteed-green.svg) [![Travis CI](https://api.travis-ci.org/ok-borg/borg.svg?branch=master)](https://travis-ci.org/ok-borg/borg) [![Go Report Card](https://goreportcard.com/badge/github.com/sniperkit/borg/pkg)](https://goreportcard.com/report/github.com/sniperkit/borg/pkg) [![Slack Status](http://ok-b.org:1492/badge.svg)](http://ok-b.org:1492)
 
 Borg was built out of the frustration of having to leave the terminal to search and click around for bash snippets.
 Glance over multiple snippets quickly with Borg's succinct output.
@@ -39,7 +39,7 @@ borg "list only files"
 
 Use `borg pipeto less` to pipe the results straight to `less` (or another program).
 
-Can't find what you are looking for? Be a good hacker and contribute your wisdom to the hive mind by [tweaking existing snippets and adding your own](https://github.com/sniperkit/borg/tree/master/docs).
+Can't find what you are looking for? Be a good hacker and contribute your wisdom to the hive mind by [tweaking existing snippets and adding your own](https://github.com/sniperkit/borg/pkg/tree/master/docs).
 
 ### Install
 
@@ -49,17 +49,17 @@ The following releases only let you search snippets. To add or edit snippets, in
 brew install borg
 ```
 
-For Linux, download [a release](https://github.com/sniperkit/borg/releases) manually:
+For Linux, download [a release](https://github.com/sniperkit/borg/pkg/releases) manually:
 
 ```
-wget https://github.com/sniperkit/borg/releases/download/v0.0.3/borg_linux_amd64 -O /usr/local/bin/borg
+wget https://github.com/sniperkit/borg/pkg/releases/download/v0.0.3/borg_linux_amd64 -O /usr/local/bin/borg
 chmod 755 /usr/local/bin/borg
 ```
 
 Same for Mac:
 
 ```
-wget https://github.com/sniperkit/borg/releases/download/v0.0.3/borg_darwin_amd64 -O /usr/local/bin/borg
+wget https://github.com/sniperkit/borg/pkg/releases/download/v0.0.3/borg_darwin_amd64 -O /usr/local/bin/borg
 chmod 755 /usr/local/bin/borg
 ```
 
@@ -75,7 +75,7 @@ This will rank the result higher for similar queries—especially helpful when a
 
 ### Advanced usage
 
-For more commands and their explanations, please see [advanced usage](https://github.com/sniperkit/borg/tree/master/docs).
+For more commands and their explanations, please see [advanced usage](https://github.com/sniperkit/borg/pkg/tree/master/docs).
 
 ### How does borg work?
 

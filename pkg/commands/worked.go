@@ -10,7 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sniperkit/borg/conf"
+	// internal
+	"github.com/sniperkit/borg/pkg/conf"
 )
 
 func init() {

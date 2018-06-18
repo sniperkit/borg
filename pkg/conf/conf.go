@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	// external
 	flag "github.com/juju/gnuflag"
 	"gopkg.in/yaml.v2"
 )

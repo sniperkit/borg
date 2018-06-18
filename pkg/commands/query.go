@@ -13,8 +13,9 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/sniperkit/borg/conf"
-	"github.com/sniperkit/borg/types"
+	// internal
+	"github.com/sniperkit/borg/pkg/conf"
+	"github.com/sniperkit/borg/pkg/types"
 )
 
 // Query the borg server

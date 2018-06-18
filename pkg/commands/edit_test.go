@@ -1,9 +1,11 @@
 package commands
 
 import (
-	"github.com/sniperkit/borg/types"
 	"reflect"
 	"testing"
+
+	// internal
+	"github.com/sniperkit/borg/pkg/types"
 )
 
 func TestTextToProblem(t *testing.T) {

@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
-
 	"strings"
 
+	// external
 	"github.com/fatih/color"
 	flag "github.com/juju/gnuflag"
-	"github.com/sniperkit/borg/commands"
-	"github.com/sniperkit/borg/conf"
+
+	// internal
+	"github.com/sniperkit/borg/pkg/commands"
+	"github.com/sniperkit/borg/pkg/conf"
 )
 
 var versionNumber, operatingSystem, architecture string

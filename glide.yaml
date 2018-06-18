@@ -1,0 +1,5 @@
+package: github.com/sniperkit/borg
+import:
+- package: github.com/fatih/color
+- package: github.com/juju/gnuflag
+- package: gopkg.in/yaml.v2
